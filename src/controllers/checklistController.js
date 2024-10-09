@@ -44,7 +44,7 @@ exports.getChecklists = async (req, res) => {
     try {
         const filter = name? { userId, name: { [Op.iLike]: `%${name}%` } } : { userId }
         const totalChecklists = await Checklist.count({ where: filter });
-        const maxPages = Math.ceil(totalChecklist / limit);
+        const maxPages = Math.ceil(totalChecklists / limit);
         const actualPage = page > maxPages? maxPages : page
         const orderBy = sort ? [[sort, order.toUpperCase()]] : [['name', 'ASC']];
         const checklists = await Checklist.findAll({

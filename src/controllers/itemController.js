@@ -1,7 +1,7 @@
 const { Op } = require('sequelize');
 const { success, error, serverError } = require('../helpers/response');
 const { emptyBody } = require('../helpers/validation');
-const { Checklist, Item } = require('../models');
+const { sequelize, Checklist, Item } = require('../models');
 
 // Get detail of a checklist including items
 exports.getChecklistDetail = async (req, res) => {
@@ -10,7 +10,7 @@ exports.getChecklistDetail = async (req, res) => {
     try {
         const checklist = await Checklist.findOne({
             where: { id: checklistId, userId: userId },
-            include: [{ model: Item }]
+            include: [{ model: Item, as: 'checklist' }]
         });
         if (!checklist) {
             return error(res, `Checklist not found`, 404);
@@ -24,10 +24,10 @@ exports.getChecklistDetail = async (req, res) => {
 // Create a new item in a checklist
 exports.createItem = async (req, res) => {
     const { checklistId } = req.params;
-    const { content } = req.body;
+    const { itemName } = req.body;
     const userId = req.user.id;
     try {
-        const emptyMessage = emptyBody({ content });
+        const emptyMessage = emptyBody({ itemName });
         if (emptyMessage) {
             return error(res, emptyMessage, 400);
         }
@@ -37,7 +37,7 @@ exports.createItem = async (req, res) => {
             return error(res, `Checklist not found`, 404);
         }
 
-        const itemBody = { content, checklistId: checklist.id };
+        const itemBody = { itemName, checklistId: checklist.id };
         const newItem = await Item.create(itemBody);
         return success(res, newItem, 201);
     } catch (err) {
@@ -70,7 +70,7 @@ exports.getItemDetail = async (req, res) => {
 // Update an item in a checklist
 exports.updateItem = async (req, res) => {
     const { itemId } = req.params;
-    const { content } = req.body;
+    const { itemName } = req.body;
     const userId = req.user.id;
     try {
         const item = await Item.findOne({
@@ -85,7 +85,7 @@ exports.updateItem = async (req, res) => {
             return error(res, `Item not found`, 404);
         }
 
-        item.content = content || item.content;
+        item.itemName = itemName || item.itemName;
         await item.save();
         return success(res, item, 200);
     } catch (err) {
@@ -96,7 +96,6 @@ exports.updateItem = async (req, res) => {
 // Update the status of an item in a checklist
 exports.updateItemStatus = async (req, res) => {
     const { itemId } = req.params;
-    const { isComplete } = req.body;
     const userId = req.user.id;
     try {
         const item = await Item.findOne({
@@ -110,8 +109,7 @@ exports.updateItemStatus = async (req, res) => {
         if (!item) {
             return error(res, `Item not found`, 404);
         }
-
-        item.isComplete = isComplete !== undefined ? isComplete : item.isComplete;
+        item.isComplete = item.isComplete ? false : true;
         await item.save();
         return success(res, item, 200);
     } catch (err) {

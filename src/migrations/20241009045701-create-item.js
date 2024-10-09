@@ -13,7 +13,8 @@ module.exports = {
         type: Sequelize.STRING
       },
       isComplete: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       },
       checklistId: {
         type: Sequelize.INTEGER,

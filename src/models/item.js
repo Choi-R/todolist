@@ -19,7 +19,10 @@ module.exports = (sequelize, DataTypes) => {
   }
   Item.init({
     itemName: DataTypes.STRING,
-    isComplete: DataTypes.BOOLEAN,
+    isComplete: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
     checklistId: {
       type: DataTypes.INTEGER,
       allowNull: false,
