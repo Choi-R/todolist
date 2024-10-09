@@ -16,7 +16,7 @@ DB_HOST=your_db_host
 DB_PORT=your_db_port
 DB_USERNAME=your_db_username
 DB_PASSWORD=your_db_password
-DB_NAME=cafetaria
+DB_NAME=todolist
 PORT=3000
 ```
 Make necessary adjustment.
